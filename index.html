@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akash Bhat — Cybersecurity Analyst</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0e0d;
+  --ink2: #1a1917;
+  --ink3: #252320;
+  --crimson: #c0392b;
+  --crimson2: #a93226;
+  --crimson-glow: rgba(192,57,43,0.15);
+  --paper: #f5f0e8;
+  --paper2: #ede8de;
+  --ash: #d4cfc6;
+  --smoke: #8a857c;
+  --text: #f5f0e8;
+  --text2: rgba(245,240,232,0.65);
+  --text3: rgba(245,240,232,0.35);
+  --display: 'Cormorant Garamond', Georgia, serif;
+  --body: 'Outfit', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--body);
+  background: var(--ink);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor {
+  position: fixed; width: 10px; height: 10px;
+  background: var(--crimson); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
+  mix-blend-mode: normal;
+}
+.cursor-ring {
+  position: fixed; width: 36px; height: 36px;
+  border: 1.5px solid rgba(192,57,43,0.5);
+  border-radius: 50%; pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s;
+}
+body:has(a:hover) .cursor { width: 16px; height: 16px; }
+body:has(a:hover) .cursor-ring { width: 50px; height: 50px; border-color: rgba(192,57,43,0.8); }
+
+/* ── THREE.JS CANVAS ── */
+#hero-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  padding: 1.5rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.4s;
+}
+nav.scrolled {
+  background: rgba(15,14,13,0.92);
+  backdrop-filter: blur(20px);
+  padding: 1rem 4rem;
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+}
+.nav-brand {
+  font-family: var(--display);
+  font-size: 1.4rem; font-weight: 600;
+  color: var(--text); text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.nav-brand em { font-style: italic; color: var(--crimson); }
+.nav-links { display: flex; gap: 0.25rem; list-style: none; }
+.nav-links a {
+  font-family: var(--body); font-size: 0.82rem; font-weight: 400;
+  color: var(--text2); text-decoration: none;
+  padding: 0.4rem 0.9rem; border-radius: 6px;
+  letter-spacing: 0.04em; transition: all 0.2s;
+}
+.nav-links a:hover { color: var(--text); background: rgba(245,240,232,0.06); }
+.nav-cta {
+  color: var(--crimson) !important;
+  border: 1px solid rgba(192,57,43,0.4) !important;
+}
+.nav-cta:hover { background: rgba(192,57,43,0.1) !important; border-color: var(--crimson) !important; }
+
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-content {
+  position: relative; z-index: 10;
+  padding: 8rem 4rem 6rem;
+  max-width: 1200px; margin: 0 auto; width: 100%;
+}
+.hero-kicker {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: var(--crimson); letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 2.5rem;
+}
+.kicker-line { width: 40px; height: 1px; background: var(--crimson); }
+.hero-name {
+  font-family: var(--display);
+  font-size: clamp(5rem, 12vw, 11rem);
+  font-weight: 700; line-height: 0.88;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.hero-name .first { color: var(--text); display: block; }
+.hero-name .last {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--crimson);
+  display: block;
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-weight: 300; font-style: italic;
+  color: var(--text2); margin-bottom: 2rem;
+  letter-spacing: 0.04em;
+}
+.hero-desc {
+  font-size: 1rem; color: var(--text2);
+  font-weight: 300; line-height: 1.85;
+  max-width: 520px; margin-bottom: 3rem;
+}
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 5rem; }
+.btn-crimson {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: var(--crimson); color: var(--text);
+  font-family: var(--body); font-size: 0.88rem; font-weight: 500;
+  padding: 0.9rem 2rem; border-radius: 6px;
+  text-decoration: none; border: 1px solid var(--crimson);
+  letter-spacing: 0.04em;
+  transition: all 0.25s; position: relative; overflow: hidden;
+}
+.btn-crimson::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0; transition: opacity 0.25s;
+}
+.btn-crimson:hover { background: var(--crimson2); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(192,57,43,0.4); }
+.btn-crimson:hover::before { opacity: 1; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: transparent; color: var(--text2);
+  font-family: var(--body); font-size: 0.88rem; font-weight: 400;
+  padding: 0.9rem 2rem; border-radius: 6px;
+  text-decoration: none; border: 1px solid rgba(245,240,232,0.15);
+  letter-spacing: 0.04em; transition: all 0.25s;
+}
+.btn-ghost:hover { color: var(--text); border-color: rgba(245,240,232,0.4); transform: translateY(-2px); }
+.hero-stats {
+  display: flex; gap: 3rem; flex-wrap: wrap;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(245,240,232,0.08);
+}
+.stat-num {
+  font-family: var(--display); font-size: 3rem; font-weight: 700;
+  color: var(--text); line-height: 1; letter-spacing: -0.03em;
+}
+.stat-num em { font-style: normal; color: var(--crimson); }
+.stat-label { font-size: 0.78rem; color: var(--text3); font-weight: 300; margin-top: 0.3rem; line-height: 1.35; letter-spacing: 0.03em; }
+
+/* scroll hint */
+.scroll-hint {
+  position: absolute; bottom: 2.5rem; right: 4rem; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  font-family: var(--mono); font-size: 0.6rem;
+  color: var(--text3); letter-spacing: 0.15em;
+  text-transform: uppercase; writing-mode: vertical-rl;
+}
+.scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, var(--crimson), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse { 0%,100%{opacity:0.4;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.1)} }
+
+/* ── SECTION SYSTEM ── */
+.section-wrap { max-width: 1200px; margin: 0 auto; padding: 0 4rem; }
+.sec { padding: 8rem 0; }
+.sec-sm { padding: 6rem 0; }
+
+.eyebrow {
+  display: flex; align-items: center; gap: 1rem;
+  font-family: var(--mono); font-size: 0.68rem;
+  color: var(--crimson); letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 1.25rem;
+}
+.eyebrow::after { content: ''; flex: 1; max-width: 50px; height: 1px; background: var(--crimson); opacity: 0.5; }
+
+.sec-title {
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700; color: var(--text);
+  line-height: 1.02; letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+.sec-title em { font-style: italic; color: var(--crimson); }
+.sec-lead {
+  font-size: 1rem; color: var(--text2);
+  font-weight: 300; line-height: 1.85;
+  max-width: 600px; margin-bottom: 4rem;
+}
+
+/* divider */
+.div-line { height: 1px; background: rgba(245,240,232,0.07); max-width: 1200px; margin: 0 auto; }
+
+/* ── JOURNEY ── */
+.journey-prose p {
+  font-size: 1.08rem; color: var(--text2);
+  font-weight: 300; line-height: 1.95;
+  margin-bottom: 1.6rem; max-width: 760px;
+}
+.journey-prose p:last-child { margin-bottom: 0; }
+
+/* achievement cards */
+.achievements {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+  margin-top: 5rem;
+  background: rgba(245,240,232,0.05);
+  border: 1px solid rgba(245,240,232,0.05);
+  border-radius: 12px; overflow: hidden;
+}
+.ach-card {
+  background: rgba(245,240,232,0.02);
+  padding: 2rem 1.75rem;
+  transition: background 0.3s;
+}
+.ach-card:hover { background: rgba(192,57,43,0.08); }
+.ach-num {
+  font-family: var(--display); font-size: 2.8rem; font-weight: 700;
+  color: var(--crimson); line-height: 1; margin-bottom: 0.5rem;
+}
+.ach-label { font-size: 0.82rem; color: var(--text3); font-weight: 300; line-height: 1.5; }
+
+/* ── SKILLS ── */
+.skills-section { background: rgba(245,240,232,0.02); border-top: 1px solid rgba(245,240,232,0.05); border-bottom: 1px solid rgba(245,240,232,0.05); }
+.skills-grid {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 1px; background: rgba(245,240,232,0.05);
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid rgba(245,240,232,0.05);
+}
+.skill-block {
+  background: var(--ink2); padding: 1.75rem;
+  transition: background 0.25s;
+}
+.skill-block:hover { background: var(--ink3); }
+.sb-head {
+  font-family: var(--mono); font-size: 0.63rem;
+  color: var(--crimson); letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 1.1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+}
+.sb-list { display: flex; flex-direction: column; gap: 0.45rem; }
+.sb-item {
+  font-size: 0.84rem; color: var(--text3); font-weight: 300;
+  padding: 0.3rem 0; border-bottom: 1px solid rgba(245,240,232,0.04);
+  transition: color 0.2s; cursor: default;
+}
+.sb-item:last-child { border-bottom: none; }
+.sb-item:hover { color: var(--text); }
+
+/* ── PROJECTS ── */
+.projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.proj-card {
+  background: var(--ink2);
+  border: 1px solid rgba(245,240,232,0.06);
+  border-radius: 12px; padding: 2rem;
+  position: relative; overflow: hidden;
+  transition: all 0.3s;
+  display: flex; flex-direction: column;
+}
+.proj-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: rgba(245,240,232,0.06); transition: background 0.3s;
+}
+.proj-card:hover { border-color: rgba(192,57,43,0.3); transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+.proj-card:hover::after { background: var(--crimson); }
+.proj-card.featured { border-color: rgba(192,57,43,0.2); }
+.proj-card.featured::after { background: var(--crimson); }
+.proj-type {
+  font-family: var(--mono); font-size: 0.63rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--smoke); margin-bottom: 1rem; font-weight: 400;
+}
+.proj-type.active { color: #4caf87; }
+.proj-type.eng { color: #c49a3c; }
+.proj-title {
+  font-family: var(--display); font-size: 1.3rem; font-weight: 600;
+  color: var(--text); line-height: 1.25; margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+.proj-desc {
+  font-size: 0.88rem; color: var(--text2); font-weight: 300;
+  line-height: 1.8; margin-bottom: 1.25rem; flex: 1;
+}
+.proj-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+.p-tool {
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--smoke); background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  padding: 0.22rem 0.65rem; border-radius: 4px;
+  transition: all 0.2s;
+}
+.p-tool:hover { color: var(--text); border-color: rgba(245,240,232,0.2); }
+.proj-footer {
+  display: flex; align-items: center; gap: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(245,240,232,0.06);
+  flex-wrap: wrap;
+}
+.proj-link {
+  font-size: 0.82rem; font-weight: 500; color: var(--text2);
+  text-decoration: none; display: flex; align-items: center; gap: 0.35rem;
+  transition: color 0.2s;
+}
+.proj-link:hover { color: var(--crimson); }
+.proj-link.dim { color: var(--text3); font-weight: 300; }
+.proj-link.dim:hover { color: var(--text2); }
+.proj-date { margin-left: auto; font-family: var(--mono); font-size: 0.6rem; color: var(--text3); }
+
+/* drone img placeholders */
+.drone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+.drone-frame {
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(245,240,232,0.08);
+  background: rgba(245,240,232,0.02);
+  aspect-ratio: 4/3;
+  display: flex; align-items: center; justify-content: center;
+}
+.drone-placeholder {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); text-align: center; padding: 1rem; line-height: 1.6;
+}
+
+/* ── CREDENTIALS ── */
+.creds-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+.creds-head {
+  font-family: var(--mono); font-size: 0.65rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding-bottom: 0.85rem; margin-bottom: 0.5rem;
+  border-bottom: 1px solid;
+}
+.creds-head.done { color: #4caf87; border-color: #4caf87; }
+.creds-head.wip { color: var(--text3); border-color: rgba(245,240,232,0.15); }
+.cred-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 0; border-bottom: 1px solid rgba(245,240,232,0.06);
+}
+.cred-item:last-child { border-bottom: none; }
+.cred-ico {
+  width: 38px; height: 38px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.cred-ico.done { background: rgba(76,175,135,0.12); }
+.cred-ico.wip { background: rgba(245,240,232,0.05); }
+.cred-body { flex: 1; }
+.cred-name { font-size: 0.92rem; font-weight: 500; color: var(--text); margin-bottom: 0.18rem; }
+.cred-meta { font-family: var(--mono); font-size: 0.63rem; color: var(--text3); margin-bottom: 0.35rem; }
+.cred-link {
+  font-family: var(--mono); font-size: 0.63rem;
+  color: var(--crimson); text-decoration: none; letter-spacing: 0.04em;
+}
+.cred-link:hover { text-decoration: underline; }
+.badge {
+  display: inline-block; font-family: var(--mono); font-size: 0.6rem;
+  padding: 0.18rem 0.55rem; border-radius: 4px; font-weight: 400; letter-spacing: 0.04em;
+}
+.badge.v { background: rgba(76,175,135,0.12); color: #4caf87; }
+.badge.p { background: rgba(245,240,232,0.04); color: var(--text3); }
+.badge.l { background: rgba(245,240,232,0.04); color: var(--smoke); }
+.prog { height: 3px; background: rgba(245,240,232,0.08); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
+.prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--crimson), #e67e5a); }
+
+/* ── EXPERIENCE ── */
+.exp-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.exp-card {
+  background: var(--ink2);
+  border: 1px solid rgba(245,240,232,0.06);
+  border-radius: 12px; padding: 2rem;
+  transition: border-color 0.25s;
+  position: relative;
+}
+.exp-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px;
+  background: transparent; transition: background 0.25s;
+}
+.exp-card:hover { border-color: rgba(245,240,232,0.12); }
+.exp-card.current::before { background: #4caf87; }
+.exp-card.academic::before { background: var(--smoke); }
+.exp-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 0.3rem; flex-wrap: wrap; gap: 0.5rem;
+}
+.exp-role { font-family: var(--display); font-size: 1.15rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.exp-pill {
+  font-family: var(--mono); font-size: 0.62rem;
+  padding: 0.22rem 0.7rem; border-radius: 100px; font-weight: 400; white-space: nowrap;
+}
+.exp-pill.cur { background: rgba(76,175,135,0.12); color: #4caf87; }
+.exp-pill.dt { background: rgba(245,240,232,0.06); color: var(--text3); }
+.exp-pill.ac { background: rgba(245,240,232,0.04); color: var(--smoke); }
+.exp-org { font-size: 0.86rem; color: var(--crimson); font-weight: 400; margin-bottom: 0.5rem; }
+.exp-note { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); margin-bottom: 0.85rem; letter-spacing: 0.04em; }
+.exp-pts { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.exp-pts li {
+  font-size: 0.88rem; color: var(--text2); font-weight: 300;
+  padding-left: 1.25rem; position: relative; line-height: 1.7;
+}
+.exp-pts li::before { content: '—'; position: absolute; left: 0; color: rgba(245,240,232,0.2); }
+
+/* ── CONTACT ── */
+.contact-bg {
+  background: var(--ink2);
+  border-top: 1px solid rgba(245,240,232,0.06);
+}
+.contact-inner { max-width: 1200px; margin: 0 auto; padding: 8rem 4rem; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+.contact-left .sec-title { margin-bottom: 1rem; }
+.contact-left p {
+  font-size: 1rem; color: var(--text2); font-weight: 300;
+  line-height: 1.85; margin-bottom: 2.5rem;
+}
+.contact-options { display: flex; flex-direction: column; gap: 0.85rem; }
+.contact-opt {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.1rem 1.3rem;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 10px; text-decoration: none;
+  transition: all 0.25s;
+}
+.contact-opt:hover { background: rgba(192,57,43,0.08); border-color: rgba(192,57,43,0.3); transform: translateX(5px); }
+.co-icon {
+  width: 42px; height: 42px; border-radius: 9px;
+  background: rgba(245,240,232,0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+  border: 1px solid rgba(245,240,232,0.08);
+}
+.co-label { font-family: var(--mono); font-size: 0.6rem; color: var(--text3); letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+.co-val { font-size: 0.9rem; color: var(--text); font-weight: 400; }
+.co-arr { margin-left: auto; color: var(--text3); transition: color 0.2s; }
+.contact-opt:hover .co-arr { color: var(--crimson); }
+
+.contact-right { }
+.quick-facts {
+  background: rgba(245,240,232,0.02);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 12px; padding: 2.5rem;
+}
+.qf-title { font-family: var(--display); font-size: 1.4rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+.qf-sub { font-size: 0.85rem; color: var(--text3); font-weight: 300; margin-bottom: 2rem; line-height: 1.6; }
+.qf-fact {
+  display: flex; align-items: flex-start; gap: 0.9rem;
+  padding: 0.75rem 0; border-bottom: 1px solid rgba(245,240,232,0.05);
+}
+.qf-fact:last-child { border-bottom: none; padding-bottom: 0; }
+.qf-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.qf-dot.g { background: #4caf87; }
+.qf-dot.y { background: #f5a623; }
+.qf-text { font-size: 0.86rem; color: var(--text2); font-weight: 300; line-height: 1.55; }
+
+/* ── FOOTER ── */
+footer {
+  background: #080807; padding: 2rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+footer p { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); }
+footer span { color: var(--smoke); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+.hero-kicker { animation: fadeUp .6s ease both; }
+.hero-name { animation: fadeUp .6s ease .12s both; }
+.hero-title { animation: fadeUp .6s ease .22s both; }
+.hero-desc { animation: fadeUp .6s ease .3s both; }
+.hero-actions { animation: fadeUp .6s ease .38s both; }
+.hero-stats { animation: fadeUp .6s ease .46s both; }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  nav{padding:1rem 2rem}
+  nav.scrolled{padding:0.75rem 2rem}
+  .nav-links{display:none}
+  .hero-content{padding:6rem 2rem 4rem}
+  .section-wrap{padding:0 2rem}
+  .achievements{grid-template-columns:1fr 1fr}
+  .skills-grid{grid-template-columns:1fr 1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .creds-layout{grid-template-columns:1fr;gap:2.5rem}
+  .contact-grid{grid-template-columns:1fr;gap:3rem}
+  .contact-inner{padding:5rem 2rem}
+  footer{flex-direction:column;gap:.5rem;text-align:center;padding:1.5rem}
+  .scroll-hint{display:none}
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+}
+@media(max-width:580px){
+  .achievements{grid-template-columns:1fr}
+  .skills-grid{grid-template-columns:1fr}
+  .hero-stats{gap:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curR"></div>
+
+<!-- THREE.JS HERO -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-kicker">
+      <div class="kicker-line"></div>
+      Cybersecurity Analyst · Melbourne, VIC
+      <div class="kicker-line"></div>
+    </div>
+    <h1 class="hero-name">
+      <span class="first">AKASH</span>
+      <span class="last">BHAT</span>
+    </h1>
+    <p class="hero-title">SOC Analyst · Threat Detection · Incident Response</p>
+    <p class="hero-desc">
+      From engineering a self-coded obstacle-avoidance drone in Bangalore to deploying enterprise SIEM detection labs in Melbourne — a career built on genuine curiosity, precision engineering, and the discipline to see complex threats clearly.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/AkashBhat10" target="_blank" class="btn-crimson">View my work on GitHub ↗</a>
+      <a href="#contact" class="btn-ghost">Get in touch</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">3<em>×</em></div>
+        <div class="stat-label">Enterprise SOC<br>home labs built</div>
+      </div>
+      <div>
+        <div class="stat-num">5<em>+</em></div>
+        <div class="stat-label">SIEM platforms<br>hands-on</div>
+      </div>
+      <div>
+        <div class="stat-num"><em>B</em>.Tech</div>
+        <div class="stat-label">Aeronautical<br>Engineering</div>
+      </div>
+      <div>
+        <div class="stat-num">6<em>+</em></div>
+        <div class="stat-label">Certifications &amp;<br>industry programmes</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- NAV (after hero so z-index works) -->
+<nav id="nav">
+  <a href="#" class="nav-brand">Akash <em>Bhat</em></a>
+  <ul class="nav-links">
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#credentials">Credentials</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact" class="nav-cta">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="div-line"></div>
+
+<!-- JOURNEY -->
+<div class="section-wrap">
+<section class="sec" id="journey">
+  <div class="eyebrow reveal">My journey</div>
+  <h2 class="sec-title reveal">From <em>aerospace</em><br>to cybersecurity</h2>
+  <div class="journey-prose">
+    <p class="reveal">My story begins in Bangalore, India. After completing a Bachelor of Technology in Aeronautical Engineering at Jain University, I spent three years interning across Asia's most demanding aerospace and engineering organisations — including Sansera Engineering, one of Asia's top-ranked aerospace manufacturers, Brahmastra Aerospace Systems, Pegasus Aerospace, and Autodesk. I designed mechanical components in AutoCAD and SolidWorks, simulated industrial aerodynamics using ANSYS, and worked hands-on with embedded systems and IoT at Probots Techno Solutions.</p>
+    <p class="reveal">My final year university project was a fully functioning obstacle-avoidance quadcopter drone. I wrote every line of the Arduino C++ control algorithm myself, designed every component in CAD, integrated four ultrasonic sensors with PID control logic, and flew it live — demonstrating real-time collision avoidance in all four directions. That project taught me that the most important skill in any technical field is not just knowing the tools, but knowing how systems behave under pressure.</p>
+    <p class="reveal">In 2023, I moved to Melbourne. I enrolled in the Certificate IV in Cybersecurity at RMIT University and spent a year building a genuine technical foundation — learning SIEM platforms including ELK Stack and QRadar, performing vulnerability assessments, deploying pfSense firewalls and Snort IDS, and completing a full simulated SOC engagement covering all five NIST CSF phases. I used Metasploit, Burp Suite, Wireshark, Cisco Packet Tracer, and Active Directory in real lab environments.</p>
+    <p class="reveal">At Medilink Australia I worked as an Operations Administrator managing sprint planning in Jira and Confluence, producing structured stakeholder reports, and supporting compliance documentation in a healthcare-adjacent environment. That role built my understanding of how regulated organisations communicate risk — a skill that transfers directly to SOC case documentation and shift handovers.</p>
+    <p class="reveal">Since graduating I have continued building independently — deploying three enterprise SOC home labs, completing cybersecurity programmes with Commonwealth Bank and Mastercard, pursuing TryHackMe's SOC Level 1 pathway, and starting courses in IBM Cybersecurity Architecture and Google AI Essentials. I am currently working at Coles CFC Truganina, with one week notice, actively seeking the right opportunity in cybersecurity, cloud, Azure, project management, or systems administration.</p>
+  </div>
+
+  <div class="achievements reveal">
+    <div class="ach-card">
+      <div class="ach-num">3</div>
+      <div class="ach-label">Enterprise SOC<br>home labs deployed</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-num">5+</div>
+      <div class="ach-label">SIEM platforms<br>hands-on</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-num">6+</div>
+      <div class="ach-label">Certifications and<br>industry programmes</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-num">10+</div>
+      <div class="ach-label">Engineering and<br>aerospace internships</div>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="div-line"></div>
+
+<!-- SKILLS -->
+<div class="skills-section">
+<div class="section-wrap">
+<section class="sec" id="skills">
+  <div class="eyebrow reveal">Technical skills</div>
+  <h2 class="sec-title reveal">Every tool listed here<br>has been used <em>hands-on</em></h2>
+  <div class="skills-grid reveal">
+    <div class="skill-block">
+      <div class="sb-head">SIEM &amp; Log Analysis</div>
+      <div class="sb-list">
+        <div class="sb-item">Splunk &amp; SPL</div>
+        <div class="sb-item">Wazuh SIEM</div>
+        <div class="sb-item">ELK Stack (Elasticsearch · Logstash · Kibana)</div>
+        <div class="sb-item">IBM QRadar</div>
+        <div class="sb-item">Microsoft Sentinel</div>
+        <div class="sb-item">IOC Investigation</div>
+        <div class="sb-item">Security Event Correlation</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Threat Detection &amp; IR</div>
+      <div class="sb-list">
+        <div class="sb-item">Alert Triage</div>
+        <div class="sb-item">Incident Response Planning</div>
+        <div class="sb-item">MITRE ATT&amp;CK Mapping</div>
+        <div class="sb-item">NIST CSF — all 5 phases</div>
+        <div class="sb-item">Sysmon Endpoint Telemetry</div>
+        <div class="sb-item">Suricata IDS</div>
+        <div class="sb-item">Vulnerability Assessment</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Network &amp; Firewall</div>
+      <div class="sb-list">
+        <div class="sb-item">Wireshark Packet Analysis</div>
+        <div class="sb-item">pfSense Firewall</div>
+        <div class="sb-item">Snort IDS/IPS</div>
+        <div class="sb-item">Cisco Packet Tracer</div>
+        <div class="sb-item">Nmap</div>
+        <div class="sb-item">Network Segmentation</div>
+        <div class="sb-item">Custom IDS Rule Authoring</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Offensive Security</div>
+      <div class="sb-list">
+        <div class="sb-item">Metasploit</div>
+        <div class="sb-item">Burp Suite</div>
+        <div class="sb-item">Nessus</div>
+        <div class="sb-item">Kali Linux</div>
+        <div class="sb-item">OWASP Top 10</div>
+        <div class="sb-item">Web App Penetration Testing</div>
+        <div class="sb-item">Hydra</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Scripting &amp; Programming</div>
+      <div class="sb-list">
+        <div class="sb-item">Python</div>
+        <div class="sb-item">Bash Scripting</div>
+        <div class="sb-item">SQL</div>
+        <div class="sb-item">SPL (Splunk Query Language)</div>
+        <div class="sb-item">KQL</div>
+        <div class="sb-item">Arduino C++</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Cloud &amp; Identity</div>
+      <div class="sb-list">
+        <div class="sb-item">Microsoft Azure (AZ-900)</div>
+        <div class="sb-item">AWS Cloud Foundations</div>
+        <div class="sb-item">Active Directory</div>
+        <div class="sb-item">Group Policy Management</div>
+        <div class="sb-item">IAM Fundamentals</div>
+        <div class="sb-item">Microsoft Sentinel</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Frameworks &amp; GRC</div>
+      <div class="sb-list">
+        <div class="sb-item">MITRE ATT&amp;CK</div>
+        <div class="sb-item">NIST CSF</div>
+        <div class="sb-item">ISO 27001 Fundamentals</div>
+        <div class="sb-item">SOCI Awareness</div>
+        <div class="sb-item">Risk Documentation</div>
+        <div class="sb-item">Compliance Workflows</div>
+      </div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-head">Engineering &amp; Design</div>
+      <div class="sb-list">
+        <div class="sb-item">AutoCAD &amp; SolidWorks</div>
+        <div class="sb-item">ANSYS Aerodynamics</div>
+        <div class="sb-item">MATLAB</div>
+        <div class="sb-item">Embedded Systems</div>
+        <div class="sb-item">IoT &amp; Sensor Integration</div>
+        <div class="sb-item">Jira &amp; Confluence</div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- PROJECTS -->
+<div class="section-wrap">
+<section class="sec" id="projects">
+  <div class="eyebrow reveal">Projects</div>
+  <h2 class="sec-title reveal">Built, tested,<br><em>documented</em></h2>
+  <p class="sec-lead reveal">Every project below has documentation, code, or reports hosted on GitHub. All files uploaded from my CV, lab reports, certifications, and drawings are accessible through these links.</p>
+  <div class="projects-grid">
+
+    <div class="proj-card featured reveal">
+      <div class="proj-type active">◉ Active · SOC Detection Lab</div>
+      <h3 class="proj-title">Enterprise SOC Lab — Wazuh, ELK Stack &amp; Suricata</h3>
+      <p class="proj-desc">Built a fully integrated virtual security operations centre combining Wazuh SIEM, Elasticsearch, Logstash, Kibana, Sysmon endpoint telemetry, and Suricata IDS. Simulated reconnaissance, brute-force, and reverse shell attacks. Investigated alerts via Kibana dashboards, correlated events across log sources, and mapped all attacker techniques to MITRE ATT&CK. Formal security reports with root cause analysis produced and documented.</p>
+      <div class="proj-tools"><span class="p-tool">Wazuh</span><span class="p-tool">Elasticsearch</span><span class="p-tool">Kibana</span><span class="p-tool">Logstash</span><span class="p-tool">Sysmon</span><span class="p-tool">Suricata</span><span class="p-tool">Kali Linux</span><span class="p-tool">MITRE ATT&CK</span></div>
+      <div class="proj-footer">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ View on GitHub</a>
+        <span class="proj-date">Mar 2026 — present</span>
+      </div>
+    </div>
+
+    <div class="proj-card reveal reveal-delay-1">
+      <div class="proj-type">SOC Detection Lab</div>
+      <h3 class="proj-title">Threat Detection Lab — Splunk &amp; SPL</h3>
+      <p class="proj-desc">Configured Sysmon for endpoint telemetry forwarded to Splunk SIEM. Simulated brute-force and reconnaissance attacks, analysed authentication logs using SPL queries, and surfaced IOCs. Mapped all detected techniques to MITRE ATT&CK. Full SPL query library and lab write-up available on GitHub.</p>
+      <div class="proj-tools"><span class="p-tool">Splunk</span><span class="p-tool">SPL</span><span class="p-tool">Sysmon</span><span class="p-tool">Kali Linux</span><span class="p-tool">MITRE ATT&CK</span></div>
+      <div class="proj-footer">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ View on GitHub</a>
+        <span class="proj-date">Jan 2026</span>
+      </div>
+    </div>
+
+    <div class="proj-card reveal">
+      <div class="proj-type">Network Security Lab</div>
+      <h3 class="proj-title">Network Intrusion Detection — pfSense &amp; Snort</h3>
+      <p class="proj-desc">Architected a segmented virtual network, authored custom Snort IDS rules to detect port scanning and SYN flood attacks, and captured malicious traffic using Wireshark. Developed and validated firewall policy sets in pfSense. Lab architecture diagram and all rule sets documented on GitHub.</p>
+      <div class="proj-tools"><span class="p-tool">pfSense</span><span class="p-tool">Snort IDS</span><span class="p-tool">Wireshark</span><span class="p-tool">Kali Linux</span><span class="p-tool">Custom IDS Rules</span></div>
+      <div class="proj-footer">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ View on GitHub</a>
+        <span class="proj-date">Feb 2026</span>
+      </div>
+    </div>
+
+    <div class="proj-card featured reveal reveal-delay-1">
+      <div class="proj-type active">◉ Security Assessment</div>
+      <h3 class="proj-title">Web Application Security Assessment — Commonwealth Bank</h3>
+      <p class="proj-desc">Conducted a structured web application security assessment as part of the Commonwealth Bank cybersecurity programme. Identified OWASP Top 10 vulnerabilities including SQL injection, OS command injection, broken access control, and session management weaknesses. Produced a formal penetration testing report with risk ratings and remediation recommendations. Also completed L1 SOC alert triage using Splunk. Full report on GitHub.</p>
+      <div class="proj-tools"><span class="p-tool">OWASP Top 10</span><span class="p-tool">Web App Testing</span><span class="p-tool">Splunk</span><span class="p-tool">SPL</span><span class="p-tool">Incident Triage</span><span class="p-tool">Risk Assessment</span></div>
+      <div class="proj-footer">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ Report on GitHub</a>
+        <a href="https://www.theforage.com/simulations/commonwealth-bank/cybersecurity-0x8g" target="_blank" class="proj-link dim">↗ Programme details</a>
+        <span class="proj-date">Feb 2026</span>
+      </div>
+    </div>
+
+    <div class="proj-card reveal">
+      <div class="proj-type">Security Awareness Programme</div>
+      <h3 class="proj-title">Enterprise Phishing Campaign Analysis — Mastercard</h3>
+      <p class="proj-desc">Designed an enterprise phishing email simulation targeting employee personas across departments. Interpreted simulation results to identify susceptibility patterns and produced a security awareness training recommendation report. Completed as part of the Mastercard cybersecurity programme. Certificate verified via Forage.</p>
+      <div class="proj-tools"><span class="p-tool">Phishing Simulation</span><span class="p-tool">Social Engineering</span><span class="p-tool">Security Awareness</span><span class="p-tool">Risk Analysis</span></div>
+      <div class="proj-footer">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ View on GitHub</a>
+        <a href="https://www.theforage.com/simulations/mastercard/cybersecurity-t8ye" target="_blank" class="proj-link dim">↗ Verify certificate</a>
+        <span class="proj-date">Apr 2026</span>
+      </div>
+    </div>
+
+    <div class="proj-card reveal reveal-delay-1">
+      <div class="proj-type eng">Engineering Build · B.Tech Final Year Project</div>
+      <h3 class="proj-title">Obstacle-Avoidance UAV — Hardware &amp; Software Build</h3>
+      <p class="proj-desc">Built a functioning quadcopter drone from scratch. Designed all mechanical components in AutoCAD and SolidWorks, wrote a real-time obstacle avoidance algorithm in Arduino C++ using 4 ultrasonic sensors and PID control logic, and integrated a KK2.1.5 flight controller. Demonstrated live collision avoidance across all four axes. Full documentation, code, 2D engineering drawings, and 3D CAD models hosted on GitHub.</p>
+      <div class="proj-tools"><span class="p-tool">Arduino C++</span><span class="p-tool">AutoCAD</span><span class="p-tool">SolidWorks</span><span class="p-tool">Embedded Systems</span><span class="p-tool">PID Control</span><span class="p-tool">Sensor Integration</span></div>
+      <div class="drone-grid">
+        <div class="drone-frame"><div class="drone-placeholder">2D Engineering Drawings<br>— upload ZIP to GitHub</div></div>
+        <div class="drone-frame"><div class="drone-placeholder">3D CAD Model Renders<br>— upload ZIP to GitHub</div></div>
+      </div>
+      <div class="proj-footer" style="margin-top:1.25rem">
+        <a href="https://github.com/AkashBhat10" target="_blank" class="proj-link">↗ Full project on GitHub</a>
+        <span class="proj-date">2021 – 2022</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+</div>
+
+<div class="div-line"></div>
+
+<!-- CREDENTIALS -->
+<div class="section-wrap">
+<section class="sec" id="credentials">
+  <div class="eyebrow reveal">Credentials</div>
+  <h2 class="sec-title reveal">Certifications &amp;<br><em>continuous learning</em></h2>
+  <div class="creds-layout reveal">
+    <div>
+      <div class="creds-head done">✓ Completed</div>
+      <div class="cred-item">
+        <div class="cred-ico done">🎓</div>
+        <div class="cred-body">
+          <div class="cred-name">Certificate IV in Cybersecurity</div>
+          <div class="cred-meta">RMIT University · Feb 2024 – Jan 2025</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;align-items:center">
+            <span class="badge v">Completed</span>
+            <a href="https://github.com/AkashBhat10" target="_blank" class="cred-link">↗ View on GitHub</a>
+          </div>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico done">☁️</div>
+        <div class="cred-body">
+          <div class="cred-name">Microsoft Azure — AZ-900 Training Badge</div>
+          <div class="cred-meta">Microsoft Azure · Verified</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;align-items:center">
+            <span class="badge v">Verified</span>
+            <a href="https://github.com/AkashBhat10" target="_blank" class="cred-link">↗ View badge</a>
+          </div>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico done">☁️</div>
+        <div class="cred-body">
+          <div class="cred-name">AWS Academy Cloud Foundations</div>
+          <div class="cred-meta">Amazon Web Services · Training badge</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;align-items:center">
+            <span class="badge v">Verified</span>
+            <a href="https://github.com/AkashBhat10" target="_blank" class="cred-link">↗ View badge</a>
+          </div>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico done">🏦</div>
+        <div class="cred-body">
+          <div class="cred-name">Commonwealth Bank — Cybersecurity Programme</div>
+          <div class="cred-meta">Forage · Feb 2026 · Code: 7MhMiEcRtY2i2yfS5</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;align-items:center">
+            <span class="badge v">Verified</span>
+            <a href="https://github.com/AkashBhat10" target="_blank" class="cred-link">↗ View certificate</a>
+          </div>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico done">💳</div>
+        <div class="cred-body">
+          <div class="cred-name">Mastercard — Cybersecurity Programme</div>
+          <div class="cred-meta">Forage · Apr 2026 · Code: 8pbRbamcNcZJeGLGr</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;align-items:center">
+            <span class="badge v">Verified</span>
+            <a href="https://github.com/AkashBhat10" target="_blank" class="cred-link">↗ View certificate</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="creds-head wip">⟳ In progress &amp; planned</div>
+      <div class="cred-item">
+        <div class="cred-ico wip">🎯</div>
+        <div class="cred-body">
+          <div class="cred-name">TryHackMe — SOC Level 1 Pathway</div>
+          <div class="cred-meta">TryHackMe · In progress · 2026</div>
+          <div class="prog"><div class="prog-fill" style="width:65%"></div></div>
+          <span class="badge l" style="margin-top:.4rem;display:inline-block">In progress</span>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico wip">🔵</div>
+        <div class="cred-body">
+          <div class="cred-name">IBM Cybersecurity Architecture</div>
+          <div class="cred-meta">IBM · Coursera · 2026</div>
+          <div class="prog"><div class="prog-fill" style="width:30%"></div></div>
+          <span class="badge l" style="margin-top:.4rem;display:inline-block">In progress</span>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico wip">🤖</div>
+        <div class="cred-body">
+          <div class="cred-name">Google AI Essentials</div>
+          <div class="cred-meta">Google · Coursera · 2026</div>
+          <div class="prog"><div class="prog-fill" style="width:40%"></div></div>
+          <span class="badge l" style="margin-top:.4rem;display:inline-block">In progress</span>
+        </div>
+      </div>
+      <div class="cred-item">
+        <div class="cred-ico wip" style="opacity:0.4">📋</div>
+        <div class="cred-body">
+          <div class="cred-name" style="color:var(--text3)">SC-900 — Microsoft Security Fundamentals</div>
+          <div class="cred-meta">Microsoft · Planning to sit soon</div>
+          <span class="badge p">Planned</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="div-line"></div>
+
+<!-- EXPERIENCE -->
+<div class="section-wrap">
+<section class="sec" id="experience">
+  <div class="eyebrow reveal">Experience</div>
+  <h2 class="sec-title reveal">Where I've<br><em>worked</em></h2>
+  <div class="exp-list">
+
+    <div class="exp-card current reveal">
+      <div class="exp-top">
+        <div class="exp-role">Team Member</div>
+        <span class="exp-pill cur">Current · 1 week notice</span>
+      </div>
+      <div class="exp-org">Coles CFC Truganina · Melbourne, VIC</div>
+      <ul class="exp-pts">
+        <li>Working in a high-volume, fast-paced fulfilment environment, building operational reliability, shift flexibility, and process discipline that transfers into SOC and operations roles.</li>
+      </ul>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-top">
+        <div class="exp-role">Operations Administrator &amp; Project Research Associate</div>
+        <span class="exp-pill dt">Aug – Nov 2025</span>
+      </div>
+      <div class="exp-org">Medilink Australia · Melbourne, VIC</div>
+      <ul class="exp-pts">
+        <li>Produced structured stakeholder reports translating complex operational findings into clear written communications for both technical and non-technical audiences.</li>
+        <li>Managed sprint tracking across multiple cross-functional teams via Jira and Confluence in a regulated, healthcare-adjacent environment with SOCI compliance requirements.</li>
+        <li>Supported compliance documentation and process validation workflows, building practical experience in risk-aware operational practices.</li>
+      </ul>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-top">
+        <div class="exp-role">Cybersecurity Analyst — Industry Programme</div>
+        <span class="exp-pill dt">Feb 2026</span>
+      </div>
+      <div class="exp-org">Commonwealth Bank Cybersecurity Programme · Remote</div>
+      <ul class="exp-pts">
+        <li>Analysed application log datasets using Splunk SIEM and SPL queries to detect anomalous activity patterns and surface IOCs — replicating L1 SOC alert triage workflows.</li>
+        <li>Built investigative dashboards in Splunk for security event visualisation and communicated findings in structured formats for both technical and non-technical stakeholders.</li>
+        <li>Completed a structured web application penetration test, producing a formal report covering OWASP Top 10 findings with risk ratings and remediation recommendations.</li>
+      </ul>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-top">
+        <div class="exp-role">Customer Support Associate</div>
+        <span class="exp-pill dt">Nov 2024 – Jan 2025</span>
+      </div>
+      <div class="exp-org">7-Eleven · Melbourne, VIC</div>
+      <ul class="exp-pts">
+        <li>Maintained consistent performance across extended shift patterns including nights — demonstrating reliability and adaptability for 24/7 operations environments.</li>
+        <li>Applied methodical troubleshooting for retail digital system issues under time pressure.</li>
+      </ul>
+    </div>
+
+    <div class="exp-card academic reveal">
+      <div class="exp-top">
+        <div class="exp-role">Security Operations Lab — SOC Level 1</div>
+        <span class="exp-pill ac">Academic project · Nov 2025</span>
+      </div>
+      <div class="exp-org">RMIT University · Melbourne, VIC</div>
+      <div class="exp-note">Structured academic security simulation completed as part of the Certificate IV in Cybersecurity.</div>
+      <ul class="exp-pts">
+        <li>Conducted end-to-end vulnerability assessments across three simulated IT environments, identifying phishing, ARP poisoning, and SYN flood attack vectors, and producing SOCI-aligned risk documentation.</li>
+        <li>Authored a complete Incident Response Plan covering all five NIST CSF phases and deployed pfSense firewall and Snort IDS/IPS for real-time intrusion detection.</li>
+        <li>Automated log monitoring and security validation using Linux Bash scripts, improving detection pipeline efficiency across the simulated environment.</li>
+      </ul>
+    </div>
+
+    <div class="exp-card reveal">
+      <div class="exp-top">
+        <div class="exp-role">Aerospace &amp; Engineering Internships</div>
+        <span class="exp-pill dt">2020 – 2023 · India</span>
+      </div>
+      <div class="exp-org">Pegasus Aerospace · Brahmastra Aerospace · Sansera Engineering · Autodesk · Probots Techno Solutions · Verzeo</div>
+      <ul class="exp-pts">
+        <li>Industrial aerodynamics simulation using ANSYS at Pegasus Aerospace; embedded systems and IoT development at Probots Techno Solutions.</li>
+        <li>Motor-generator design using Autodesk tools; aerospace design and structural simulation at Brahmastra Aerospace Systems.</li>
+        <li>Summer placement at Sansera Engineering — one of Asia's top aerospace manufacturers — and AutoCAD programme at Verzeo.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+</div>
+
+<!-- CONTACT -->
+<div class="contact-bg" id="contact">
+<div class="contact-inner">
+  <div class="eyebrow" style="color:rgba(192,57,43,0.7)">Contact</div>
+  <h2 class="sec-title">Open to the right<br><em>opportunity</em></h2>
+  <p style="font-size:1rem;color:var(--text2);font-weight:300;line-height:1.85;max-width:580px;margin-bottom:3rem;">Based in Melbourne and open to opportunities across Australia and New Zealand. Choose how you'd like to reach out.</p>
+  <div class="contact-grid">
+    <div>
+      <div class="contact-options">
+        <a href="mailto:akashprakash471@gmail.com" class="contact-opt">
+          <div class="co-icon">✉</div>
+          <div>
+            <div class="co-label">Email</div>
+            <div class="co-val">akashprakash471@gmail.com</div>
+          </div>
+          <div class="co-arr">↗</div>
+        </a>
+        <a href="tel:+61474523118" class="contact-opt">
+          <div class="co-icon">📞</div>
+          <div>
+            <div class="co-label">Phone</div>
+            <div class="co-val">0474 523 118</div>
+          </div>
+          <div class="co-arr">↗</div>
+        </a>
+        <a href="https://www.linkedin.com/in/akashbhat01" target="_blank" class="contact-opt">
+          <div class="co-icon" style="font-size:0.9rem;font-weight:600;letter-spacing:0">in</div>
+          <div>
+            <div class="co-label">LinkedIn</div>
+            <div class="co-val">linkedin.com/in/akashbhat01</div>
+          </div>
+          <div class="co-arr">↗</div>
+        </a>
+        <a href="https://github.com/AkashBhat10" target="_blank" class="contact-opt">
+          <div class="co-icon">🐙</div>
+          <div>
+            <div class="co-label">GitHub</div>
+            <div class="co-val">github.com/AkashBhat10</div>
+          </div>
+          <div class="co-arr">↗</div>
+        </a>
+      </div>
+    </div>
+    <div class="contact-right">
+      <div class="quick-facts">
+        <div class="qf-title">Quick facts</div>
+        <div class="qf-sub">Everything useful before you reach out.</div>
+        <div class="qf-fact"><div class="qf-dot g"></div><div class="qf-text">One week notice — available to start quickly</div></div>
+        <div class="qf-fact"><div class="qf-dot g"></div><div class="qf-text">Permanent Resident — full working rights, no sponsorship required</div></div>
+        <div class="qf-fact"><div class="qf-dot g"></div><div class="qf-text">Open to 24/7 SOC rotations including nights and weekends</div></div>
+        <div class="qf-fact"><div class="qf-dot g"></div><div class="qf-text">Based in Melbourne — open to relocate anywhere in Australia</div></div>
+        <div class="qf-fact"><div class="qf-dot g"></div><div class="qf-text">Open to New Zealand opportunities — Australian PR holder</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>
+  <p>© 2026 <span>Akash Bhat</span> · Melbourne, VIC · Cybersecurity Analyst</p>
+  <p>Hosted on <span>GitHub Pages</span> · Built with HTML &amp; CSS · No frameworks</p>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+  camera.position.z = 5;
+
+  // Particles
+  const count = 2000;
+  const geo = new THREE.BufferGeometry();
+  const pos = new Float32Array(count * 3);
+  const sizes = new Float32Array(count);
+  for(let i = 0; i < count; i++){
+    pos[i*3] = (Math.random()-0.5)*20;
+    pos[i*3+1] = (Math.random()-0.5)*20;
+    pos[i*3+2] = (Math.random()-0.5)*10;
+    sizes[i] = Math.random() * 2 + 0.5;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('size', new THREE.BufferAttribute(sizes,1));
+
+  const mat = new THREE.PointsMaterial({
+    color: 0xc0392b, size: 0.04,
+    transparent: true, opacity: 0.6,
+    sizeAttenuation: true
+  });
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  // Connecting lines — sparse grid
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xc0392b, transparent: true, opacity: 0.06 });
+  for(let i = 0; i < 60; i++){
+    const lineGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*5),
+      new THREE.Vector3((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*5)
+    ]);
+    scene.add(new THREE.Line(lineGeo, lineMat));
+  }
+
+  // Floating geometric shapes
+  const shapes = [];
+  const shapeMat = new THREE.MeshBasicMaterial({ color: 0xc0392b, wireframe: true, transparent: true, opacity: 0.12 });
+  for(let i = 0; i < 6; i++){
+    const geom = i % 2 === 0
+      ? new THREE.IcosahedronGeometry(Math.random()*0.5+0.2, 0)
+      : new THREE.OctahedronGeometry(Math.random()*0.4+0.15, 0);
+    const mesh = new THREE.Mesh(geom, shapeMat.clone());
+    mesh.position.set((Math.random()-0.5)*14, (Math.random()-0.5)*8, (Math.random()-0.5)*4);
+    mesh.userData = {
+      rx: (Math.random()-0.5)*0.006,
+      ry: (Math.random()-0.5)*0.006,
+      floatAmp: Math.random()*0.3+0.1,
+      floatSpd: Math.random()*0.4+0.2,
+      floatOff: Math.random()*Math.PI*2
+    };
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  let mouse = { x: 0, y: 0 };
+  document.addEventListener('mousemove', e => {
+    mouse.x = (e.clientX/window.innerWidth - 0.5) * 2;
+    mouse.y = -(e.clientY/window.innerHeight - 0.5) * 2;
+  });
+
+  function resize(){
+    const hero = document.querySelector('.hero');
+    const w = hero.clientWidth, h = hero.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  let t = 0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t += 0.008;
+    points.rotation.y = t * 0.05 + mouse.x * 0.15;
+    points.rotation.x = mouse.y * 0.08;
+    shapes.forEach(s => {
+      s.rotation.x += s.userData.rx;
+      s.rotation.y += s.userData.ry;
+      s.position.y += Math.sin(t * s.userData.floatSpd + s.userData.floatOff) * 0.002;
+    });
+    camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.04;
+    camera.position.y += (mouse.y * 0.3 - camera.position.y) * 0.04;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// Cursor
+const cur = document.getElementById('cur');
+const curR = document.getElementById('curR');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+  setTimeout(() => {
+    curR.style.left = e.clientX + 'px';
+    curR.style.top = e.clientY + 'px';
+  }, 80);
+});
+
+// Nav scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
