@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Obstacle Avoidance UAV — Akash Bhat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0e0d; --ink2: #1a1917; --ink3: #252320;
+  --gold: #c49a3c; --gold-dim: rgba(196,154,60,0.12);
+  --crimson: #c0392b;
+  --paper: #f5f0e8;
+  --text: #f5f0e8; --text2: rgba(245,240,232,0.65); --text3: rgba(245,240,232,0.35);
+  --green: #27ae60; --green-dim: rgba(39,174,96,0.12);
+  --display: 'Cormorant Garamond', serif;
+  --body: 'Outfit', sans-serif; --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--body); background: var(--ink); color: var(--text); line-height: 1.7; font-size: 16px; }
+
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 3rem; display: flex; align-items: center; justify-content: space-between;
+  background: rgba(15,14,13,0.95); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+}
+.nav-back { font-family: var(--mono); font-size: 0.75rem; color: var(--text2); text-decoration: none; letter-spacing: 0.08em; transition: color 0.2s; }
+.nav-back:hover { color: var(--gold); }
+.nav-title { font-family: var(--mono); font-size: 0.7rem; color: var(--text3); letter-spacing: 0.1em; }
+
+.project-hero { padding: 7rem 3rem 4rem; max-width: 1000px; margin: 0 auto; border-bottom: 1px solid rgba(245,240,232,0.06); }
+.project-tag {
+  font-family: var(--mono); font-size: 0.68rem; color: var(--gold);
+  letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.project-tag::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+.project-title {
+  font-family: var(--display); font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 700; line-height: 1.05; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 1.5rem;
+}
+.project-title em { font-style: italic; color: var(--gold); }
+.project-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+.meta-pill {
+  font-family: var(--mono); font-size: 0.68rem;
+  color: var(--text3); background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  padding: 0.3rem 0.85rem; border-radius: 4px; letter-spacing: 0.06em;
+}
+.meta-pill.hl { color: var(--gold); border-color: rgba(196,154,60,0.3); background: var(--gold-dim); }
+.project-summary {
+  font-size: 1.05rem; color: var(--text2); font-weight: 300;
+  line-height: 1.85; padding: 1.5rem;
+  background: rgba(245,240,232,0.03);
+  border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0;
+}
+
+.project-body { max-width: 1000px; margin: 0 auto; padding: 3rem; }
+.section-block { margin-bottom: 4rem; }
+.section-num {
+  font-family: var(--mono); font-size: 0.65rem; color: var(--gold);
+  letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.section-num::after { content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--gold); opacity: 0.4; }
+.section-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; letter-spacing: -0.01em; }
+.section-title em { font-style: italic; color: var(--gold); }
+p.body-text { font-size: 0.95rem; color: var(--text2); font-weight: 300; line-height: 1.85; margin-bottom: 1rem; }
+
+/* SPECS GRID */
+.specs-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
+  background: rgba(245,240,232,0.05); border-radius: 10px; overflow: hidden;
+  border: 1px solid rgba(245,240,232,0.05); margin: 1.5rem 0;
+}
+.spec-card { background: rgba(245,240,232,0.02); padding: 1.25rem 1.5rem; transition: background 0.2s; }
+.spec-card:hover { background: var(--gold-dim); }
+.spec-key { font-family: var(--mono); font-size: 0.62rem; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.spec-val { font-size: 0.92rem; color: var(--text); font-weight: 400; }
+
+/* COMPONENTS */
+.components-list { display: flex; flex-direction: column; gap: 0.85rem; margin: 1.5rem 0; }
+.component-row {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.25rem;
+  background: rgba(245,240,232,0.02);
+  border: 1px solid rgba(245,240,232,0.06); border-radius: 8px;
+}
+.comp-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.comp-body { }
+.comp-name { font-size: 0.92rem; font-weight: 500; color: var(--text); margin-bottom: 0.2rem; }
+.comp-desc { font-size: 0.84rem; color: var(--text2); font-weight: 300; line-height: 1.6; }
+
+/* ALGORITHM */
+.algo-steps { display: flex; flex-direction: column; gap: 1px; margin: 1.5rem 0; background: rgba(245,240,232,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(245,240,232,0.05); }
+.algo-step {
+  display: flex; gap: 0; align-items: stretch;
+  background: rgba(245,240,232,0.02);
+  transition: background 0.2s;
+}
+.algo-step:hover { background: var(--gold-dim); }
+.algo-num {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--gold);
+  width: 60px; flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; border-right: 1px solid rgba(245,240,232,0.05);
+  font-weight: 500;
+}
+.algo-content { padding: 1rem 1.25rem; }
+.algo-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.35rem; }
+.algo-text { font-size: 0.88rem; color: var(--text2); font-weight: 300; line-height: 1.65; }
+
+/* CODE */
+.code-block {
+  font-family: var(--mono); font-size: 0.78rem; color: #98d982;
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(245,240,232,0.06);
+  border-radius: 8px; padding: 1.25rem 1.5rem; margin: 1rem 0;
+  overflow-x: auto; line-height: 1.65;
+}
+.code-comment { color: rgba(245,240,232,0.3); }
+.code-keyword { color: #69b8f7; }
+.code-string { color: #f4c76b; }
+
+/* RESULTS */
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(245,240,232,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(245,240,232,0.05); margin: 1.5rem 0; }
+.result-card { background: rgba(245,240,232,0.02); padding: 1.5rem; }
+.result-num { font-family: var(--display); font-size: 2.5rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 0.4rem; }
+.result-label { font-size: 0.82rem; color: var(--text3); font-weight: 300; }
+
+/* CAD SECTION */
+.cad-placeholder {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1.5rem 0;
+}
+.cad-frame {
+  background: rgba(245,240,232,0.03); border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 8px; aspect-ratio: 4/3;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 1.25rem; text-align: center;
+  transition: border-color 0.2s;
+}
+.cad-frame:hover { border-color: rgba(196,154,60,0.3); }
+.cad-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.cad-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); letter-spacing: 0.08em; line-height: 1.5; }
+
+/* LEARNING */
+.learning-list { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+.learning-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.25rem;
+  background: var(--green-dim); border: 1px solid rgba(39,174,96,0.15);
+  border-radius: 8px;
+}
+.l-icon { color: var(--green); flex-shrink: 0; margin-top: 2px; }
+.l-text { font-size: 0.9rem; color: var(--text2); font-weight: 300; line-height: 1.65; }
+
+.conclusion-box {
+  background: var(--gold-dim); border: 1px solid rgba(196,154,60,0.25);
+  border-radius: 10px; padding: 2rem; margin-top: 2rem;
+}
+.conclusion-box p { font-size: 0.95rem; color: var(--text2); font-weight: 300; line-height: 1.85; }
+
+.project-footer {
+  max-width: 1000px; margin: 0 auto; padding: 2rem 3rem;
+  border-top: 1px solid rgba(245,240,232,0.06);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.project-footer p { font-family: var(--mono); font-size: 0.65rem; color: var(--text3); }
+.back-btn { font-family: var(--mono); font-size: 0.72rem; color: var(--gold); text-decoration: none; border: 1px solid rgba(196,154,60,0.3); padding: 0.4rem 1rem; border-radius: 6px; transition: all 0.2s; }
+.back-btn:hover { background: var(--gold-dim); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.project-hero { animation: fadeUp 0.6s ease both; }
+
+/* CAD DOC CARDS */
+.cad-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+.cad-doc-card {
+  display: flex; flex-direction: column;
+  background: rgba(245,240,232,0.02);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 10px; overflow: hidden;
+  text-decoration: none; transition: all 0.25s;
+}
+.cad-doc-card:hover { border-color: rgba(196,154,60,0.4); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.cad-doc-preview {
+  position: relative; height: 160px;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+}
+.cad-doc-icon { position: relative; z-index: 2; }
+.cad-drawing-lines { position: absolute; inset: 0; }
+.draw-line {
+  position: absolute; left: 10%;
+  height: 1px; background: rgba(196,154,60,0.12);
+}
+.draw-line.vertical { width: 1px; height: 60%; }
+.cad-doc-info { padding: 1.1rem 1.25rem; }
+.cad-doc-badge {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--gold); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 0.4rem;
+}
+.cad-doc-name { font-size: 0.92rem; font-weight: 500; color: var(--text); margin-bottom: 0.3rem; }
+.cad-doc-sub { font-size: 0.8rem; color: var(--text3); font-weight: 300; line-height: 1.5; margin-bottom: 0.75rem; }
+.cad-doc-action {
+  font-family: var(--mono); font-size: 0.68rem; color: var(--gold);
+  letter-spacing: 0.06em; transition: letter-spacing 0.2s;
+}
+.cad-doc-card:hover .cad-doc-action { letter-spacing: 0.1em; }
+@media(max-width:580px){ .cad-two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-back">← Back to Portfolio</a>
+  <div class="nav-title">ENGINEERING PROJECT · AKASH BHAT · 2021–2022</div>
+</nav>
+
+<div class="project-hero">
+  <div class="project-tag">Engineering Build — B.Tech Final Year Project</div>
+  <h1 class="project-title">Obstacle-Avoidance<br><em>UAV — Built from Scratch</em></h1>
+  <div class="project-meta">
+    <span class="meta-pill hl">Akash Bhat</span>
+    <span class="meta-pill">Jain University · 2021–2022</span>
+    <span class="meta-pill">Arduino C++ · AutoCAD · SolidWorks</span>
+    <span class="meta-pill">Hardware + Software build</span>
+    <span class="meta-pill">Successfully flight-tested</span>
+  </div>
+  <div class="project-summary">
+    I designed, built, and flew a fully functioning obstacle-avoidance quadcopter drone from scratch as my final year B.Tech project. I wrote every line of the C++ obstacle avoidance algorithm, designed every mechanical component in AutoCAD and SolidWorks, assembled the full hardware stack, and successfully demonstrated real-time collision avoidance in all four directional axes during live testing.
+  </div>
+</div>
+
+<div class="project-body">
+
+  <div class="section-block">
+    <div class="section-num">01 · Project Overview</div>
+    <h2 class="section-title">What I <em>built</em></h2>
+    <p class="body-text">Most drones crash into obstacles because they rely on a human operator to avoid them. My project set out to solve this autonomously — designing a quadcopter that could sense obstacles in real-time across four directions and automatically manoeuvre away from them, without human input.</p>
+    <p class="body-text">The project combined mechanical design, electronics assembly, embedded programming, and live flight testing — all done by me. The result was a working drone that successfully avoided obstacles in all four axes during testing.</p>
+    <div class="specs-grid">
+      <div class="spec-card"><div class="spec-key">Frame</div><div class="spec-val">F450 quadcopter frame — glass fibre and polyamide nylon</div></div>
+      <div class="spec-card"><div class="spec-key">Motors</div><div class="spec-val">4 × 1000KV brushless DC motors</div></div>
+      <div class="spec-card"><div class="spec-key">Controller</div><div class="spec-val">KK2.1.5 flight controller + Arduino UNO</div></div>
+      <div class="spec-card"><div class="spec-key">Sensors</div><div class="spec-val">4 × HC-SR04 ultrasonic distance sensors</div></div>
+      <div class="spec-card"><div class="spec-key">Power</div><div class="spec-val">LiPo 3-cell battery — 20 mins flight time</div></div>
+      <div class="spec-card"><div class="spec-key">Total weight</div><div class="spec-val">~1.8 kg including battery · 0.5 kg payload</div></div>
+      <div class="spec-card"><div class="spec-key">Detection range</div><div class="spec-val">Obstacles detected at 50 cm — avoidance at 30 cm</div></div>
+      <div class="spec-card"><div class="spec-key">Coverage</div><div class="spec-val">Forward, backward, left, right — all 4 axes</div></div>
+      <div class="spec-card"><div class="spec-key">Software</div><div class="spec-val">Arduino C++ with custom PID avoidance algorithm</div></div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">02 · Hardware I Assembled</div>
+    <h2 class="section-title">The physical <em>build</em></h2>
+    <p class="body-text">I sourced, assembled, wired, and calibrated every component of this drone myself. Here is what went into it and why each part was chosen:</p>
+    <div class="components-list">
+      <div class="component-row"><div class="comp-icon">🚁</div><div class="comp-body"><div class="comp-name">F450 Frame</div><div class="comp-desc">High-quality 450mm quadcopter frame with glass fibre body and polyamide nylon arms. I chose this frame for its integrated PCB power distribution — eliminating the need for a separate power board and keeping the electronic layout clean. I designed reinforced arm mounts in SolidWorks before assembly.</div></div></div>
+      <div class="component-row"><div class="comp-icon">⚡</div><div class="comp-body"><div class="comp-name">1000KV Brushless Motors × 4</div><div class="comp-desc">Four brushless DC motors, each rated at 1000KV. I performed motor thrust calculations manually — the drone required at least 2× its total mass in thrust to achieve stable flight and payload capacity. These motors provided 900g thrust each, giving a total of 3.6kg thrust against 1.8kg weight.</div></div></div>
+      <div class="component-row"><div class="comp-icon">🎛️</div><div class="comp-body"><div class="comp-name">KK2.1.5 Flight Controller</div><div class="comp-desc">The flight controller reads gyroscope and accelerometer data to maintain stable flight. I configured the KK2.1.5 from scratch — setting motor layout, receiver type, ESC throttle limits, and PID tuning. The controller receives roll and pitch commands from my Arduino obstacle avoidance code via PWM signals.</div></div></div>
+      <div class="component-row"><div class="comp-icon">🔌</div><div class="comp-body"><div class="comp-name">Electronic Speed Controllers (ESCs) × 4</div><div class="comp-desc">One ESC per motor — each converts PWM signals from the flight controller into the three-phase power required by the brushless motors. I soldered all four ESCs directly to the frame PCB and calibrated throttle limits before first flight.</div></div></div>
+      <div class="component-row"><div class="comp-icon">📡</div><div class="comp-body"><div class="comp-name">HC-SR04 Ultrasonic Sensors × 4</div><div class="comp-desc">Ultrasonic sensors measure distance by emitting a 40kHz sound pulse and measuring the echo return time. I mounted one sensor facing each direction — forward, backward, left, right. Each sensor connects to the Arduino UNO via TRIG and ECHO pins, and can measure distances from 2cm to 200cm with 3mm accuracy.</div></div></div>
+      <div class="component-row"><div class="comp-icon">🧠</div><div class="comp-body"><div class="comp-name">Arduino UNO — The Brain</div><div class="comp-desc">The Arduino UNO runs my obstacle avoidance algorithm in real-time. It reads distance from all four sensors simultaneously, compares them against threshold values, and modifies the roll and pitch PWM signals sent to the flight controller — causing the drone to automatically manoeuvre away from any detected obstacle.</div></div></div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">03 · The Algorithm I Wrote</div>
+    <h2 class="section-title">How the <em>code works</em></h2>
+    <p class="body-text">I wrote the obstacle avoidance algorithm from scratch in Arduino C++. Here is the logic step by step:</p>
+    <div class="algo-steps">
+      <div class="algo-step"><div class="algo-num">01</div><div class="algo-content"><div class="algo-label">Read distances</div><div class="algo-text">Every loop cycle, the Arduino reads distance values from all four HC-SR04 sensors simultaneously — Forward (d1), Backward (d2), Left (d3), Right (d4) — using the NewPing library</div></div></div>
+      <div class="algo-step"><div class="algo-num">02</div><div class="algo-content"><div class="algo-label">Read receiver channels</div><div class="algo-text">The current roll and pitch values from the radio transmitter receiver are read via pulseIn() — these represent what the pilot is commanding the drone to do</div></div></div>
+      <div class="algo-step"><div class="algo-num">03</div><div class="algo-content"><div class="algo-label">Check thresholds</div><div class="algo-text">If any sensor reads less than 30cm, an obstacle is within avoidance range. The algorithm calculates a corrective roll or pitch value proportional to the distance — the closer the obstacle, the stronger the correction</div></div></div>
+      <div class="algo-step"><div class="algo-num">04</div><div class="algo-content"><div class="algo-label">Override control signals</div><div class="algo-text">The modified roll/pitch values override the receiver signals and are sent to the KK2.1.5 flight controller via the Servo library — causing the drone to automatically move away from the obstacle</div></div></div>
+      <div class="algo-step"><div class="algo-num">05</div><div class="algo-content"><div class="algo-label">Resume normal flight</div><div class="algo-text">When no obstacle is within range, the original receiver signals pass through unmodified and the drone responds normally to pilot input</div></div></div>
+    </div>
+    <div class="code-block">
+<span class="code-comment">// Core obstacle avoidance logic — written by Akash Bhat</span>
+<span class="code-keyword">void</span> loop() {
+  <span class="code-comment">// Read distances from all 4 ultrasonic sensors</span>
+  obstacle_forward  = sonar[0].ping_cm();
+  obstacle_backward = sonar[1].ping_cm();
+  obstacle_left     = sonar[2].ping_cm();
+  obstacle_right    = sonar[3].ping_cm();
+
+  <span class="code-comment">// Read pilot commands from receiver</span>
+  roll  = pulseIn(ROLL_PIN, HIGH);
+  pitch = pulseIn(PITCH_PIN, HIGH);
+
+  <span class="code-comment">// If obstacle detected — override and correct</span>
+  <span class="code-keyword">if</span>(obstacle_left &lt; 50 && obstacle_left &gt; 5) {
+    roll_to_kk = roll + <span class="code-keyword">int</span>(1000 / obstacle_left);
+    <span class="code-comment">// Roll right — away from left obstacle</span>
+  }
+  <span class="code-keyword">if</span>(obstacle_right &lt; 50 && obstacle_right &gt; 5) {
+    roll_to_kk = roll - <span class="code-keyword">int</span>(1000 / obstacle_right);
+    <span class="code-comment">// Roll left — away from right obstacle</span>
+  }
+  <span class="code-keyword">if</span>(obstacle_forward &lt; 50 && obstacle_forward &gt; 5) {
+    pitch_to_kk = pitch - <span class="code-keyword">int</span>(1000 / obstacle_forward);
+    <span class="code-comment">// Pitch backward — away from forward obstacle</span>
+  }
+  <span class="code-keyword">if</span>(obstacle_backward &lt; 50 && obstacle_backward &gt; 5) {
+    pitch_to_kk = pitch + <span class="code-keyword">int</span>(1000 / obstacle_backward);
+    <span class="code-comment">// Pitch forward — away from rear obstacle</span>
+  }
+  <span class="code-comment">// Send corrected values to flight controller</span>
+  out1.write(roll_to_kk);
+  out2.write(pitch_to_kk);
+}
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">04 · Design Work</div>
+    <h2 class="section-title">CAD drawings &amp; <em>3D models</em></h2>
+    <p class="body-text">I designed all mechanical components in AutoCAD (2D engineering drawings) and SolidWorks (3D models) before physical assembly. Every part was dimensioned and validated in software first.</p>
+    <div class="cad-two-col">
+      <a href="https://github.com/AkashBhat10/portfolio/blob/main/Major%20project%202D%20pdf%20.pdf" target="_blank" class="cad-doc-card">
+        <div class="cad-doc-preview">
+          <div class="cad-doc-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <rect x="8" y="4" width="28" height="36" rx="3" stroke="rgba(196,154,60,0.6)" stroke-width="1.5" fill="none"/>
+              <rect x="8" y="4" width="28" height="36" rx="3" fill="rgba(196,154,60,0.06)"/>
+              <line x1="14" y1="16" x2="30" y2="16" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="14" y1="21" x2="30" y2="21" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="14" y1="26" x2="24" y2="26" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <rect x="18" y="10" width="8" height="3" rx="1" fill="rgba(196,154,60,0.2)" stroke="rgba(196,154,60,0.4)" stroke-width="0.5"/>
+              <path d="M22 30 L26 30 L26 38 L22 38" stroke="rgba(196,154,60,0.5)" stroke-width="1" fill="none"/>
+              <line x1="19" y1="34" x2="29" y2="34" stroke="rgba(196,154,60,0.3)" stroke-width="0.5" stroke-dasharray="2,1"/>
+            </svg>
+          </div>
+          <div class="cad-drawing-lines">
+            <div class="draw-line" style="width:70%;top:20%"></div>
+            <div class="draw-line" style="width:50%;top:35%"></div>
+            <div class="draw-line" style="width:80%;top:50%"></div>
+            <div class="draw-line" style="width:40%;top:65%"></div>
+            <div class="draw-line vertical" style="left:25%;height:60%;top:20%"></div>
+            <div class="draw-line vertical" style="left:65%;height:40%;top:30%"></div>
+          </div>
+        </div>
+        <div class="cad-doc-info">
+          <div class="cad-doc-badge">2D Engineering Drawings</div>
+          <div class="cad-doc-name">AutoCAD — Major Project</div>
+          <div class="cad-doc-sub">F450 plates · propeller · motor · arm · assembly — all dimensioned drawings</div>
+          <div class="cad-doc-action">↗ Open full PDF</div>
+        </div>
+      </a>
+
+      <a href="https://github.com/AkashBhat10/portfolio/blob/main/Obstacle%20Avoidance%20of%20UAVs.pdf" target="_blank" class="cad-doc-card">
+        <div class="cad-doc-preview">
+          <div class="cad-doc-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <polygon points="24,6 36,14 36,34 24,42 12,34 12,14" stroke="rgba(196,154,60,0.6)" stroke-width="1.5" fill="rgba(196,154,60,0.06)"/>
+              <polygon points="24,12 31,17 31,31 24,36 17,31 17,17" stroke="rgba(196,154,60,0.35)" stroke-width="1" fill="none"/>
+              <line x1="24" y1="6" x2="24" y2="12" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="36" y1="14" x2="31" y2="17" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="36" y1="34" x2="31" y2="31" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="24" y1="42" x2="24" y2="36" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="12" y1="34" x2="17" y2="31" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <line x1="12" y1="14" x2="17" y2="17" stroke="rgba(196,154,60,0.4)" stroke-width="1"/>
+              <circle cx="24" cy="24" r="3" fill="rgba(196,154,60,0.3)" stroke="rgba(196,154,60,0.6)" stroke-width="1"/>
+            </svg>
+          </div>
+          <div class="cad-drawing-lines">
+            <div class="draw-line" style="width:60%;top:25%"></div>
+            <div class="draw-line" style="width:45%;top:40%"></div>
+            <div class="draw-line" style="width:75%;top:55%"></div>
+            <div class="draw-line" style="width:35%;top:70%"></div>
+            <div class="draw-line vertical" style="left:35%;height:50%;top:25%"></div>
+            <div class="draw-line vertical" style="left:70%;height:35%;top:35%"></div>
+          </div>
+        </div>
+        <div class="cad-doc-info">
+          <div class="cad-doc-badge">3D Model &amp; Full Report</div>
+          <div class="cad-doc-name">SolidWorks — UAV Project Report</div>
+          <div class="cad-doc-sub">3D component renders · motor design · assembly · algorithm · test results</div>
+          <div class="cad-doc-action">↗ Open full PDF</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">05 · Results</div>
+    <h2 class="section-title">What I <em>achieved</em></h2>
+    <div class="results-grid">
+      <div class="result-card"><div class="result-num">4</div><div class="result-label">Directional axes with successful obstacle avoidance (forward, backward, left, right)</div></div>
+      <div class="result-card"><div class="result-num">30cm</div><div class="result-label">Detection and avoidance threshold — drone automatically corrects at this range</div></div>
+      <div class="result-card"><div class="result-num">1.8kg</div><div class="result-label">Total drone weight including battery — met all design targets</div></div>
+      <div class="result-card"><div class="result-num">9 min</div><div class="result-label">Flight endurance in obstacle avoidance mode during hardware testing</div></div>
+    </div>
+    <p class="body-text" style="margin-top:1.5rem">During the first flight test, the propellers sustained minor damage on landing but the sensor module and avoidance system remained fully operational. The drone successfully detected and avoided obstacles in all four directions during testing — the core objective of the project was met.</p>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">06 · What I Learned</div>
+    <h2 class="section-title">Skills this project <em>built</em></h2>
+    <div class="learning-list">
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">Real-time embedded systems programming in C++ — writing algorithms that must execute in microseconds with hardware timing constraints</div></div>
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">Hardware-software integration — understanding how code decisions translate to physical behaviour in a moving system</div></div>
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">Systems thinking — the drone only works if all subsystems (power, sensors, flight controller, algorithm) function correctly together. Failure in any one stops everything.</div></div>
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">Engineering documentation — producing precise 2D and 3D technical drawings to engineering standards using AutoCAD and SolidWorks</div></div>
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">Methodical debugging — isolating which of many interconnected components was causing unexpected behaviour during testing</div></div>
+      <div class="learning-item"><div class="l-icon">✓</div><div class="l-text">How this applies to cybersecurity — the mindset of understanding how a system behaves under attack (or stress), finding the weak points, and building defences is the same whether you are designing a drone or investigating a SIEM alert</div></div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-num">07 · Conclusion</div>
+    <h2 class="section-title">Why this <em>matters</em></h2>
+    <div class="conclusion-box">
+      <p>This project proved that I can take a complex technical problem — autonomous obstacle avoidance — and solve it end to end: from concept, through mechanical design, electronics assembly, algorithm development, testing, and documentation. I did not follow a tutorial. I read datasheets, ran calculations, made mistakes, debugged them, and arrived at a working solution.</p>
+      <br>
+      <p>That same discipline — understanding systems deeply, finding failure points, and building reliable solutions — is exactly what a SOC analyst does every day when investigating alerts, and what a systems administrator or cloud engineer does when designing secure, resilient infrastructure.</p>
+      <br>
+      <p style="color:rgba(245,240,232,0.35);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.06em">Project by: Akash Bhat · B.Tech Aeronautical Engineering · Jain University · 2021–2022</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="project-footer">
+  <p>Akash Bhat · Obstacle Avoidance UAV · B.Tech Final Year Project · 2021–2022</p>
+  <a href="index.html" class="back-btn">← Back to portfolio</a>
+</div>
+</body>
+</html>
